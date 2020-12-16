@@ -51,6 +51,7 @@ jobs:
           # Provided by Actions. No need to create a token.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: cli_release_v${{ github.event.inputs.release_version }}
+          pr_title: "CLI release v${{ github.event.inputs.release_version }}"
     
       - name: Draft GitHub release
         uses: actions/create-release@v1
