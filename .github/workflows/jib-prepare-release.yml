@@ -23,7 +23,7 @@ jobs:
         run: |
           case ${{ github.event.inputs.project }} in
             build-plan|core|maven|gradle|extension-common|maven-extension|gradle-extension) ;;
-            *) echo 'invalid project name "${{ github.event.inputs.project }}"'
+            *) echo 'invalid input project name "${{ github.event.inputs.project }}"'
                exit 1
                ;;
           esac
