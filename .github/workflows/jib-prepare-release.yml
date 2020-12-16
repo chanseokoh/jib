@@ -62,7 +62,7 @@ jobs:
           # Provided by Actions. No need to create a token.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: ${{ github.event.inputs.project }}-release-v${{ github.event.inputs.release_version }}
-          pr_title: "${{ github.event.inputs.project } release v${{ github.event.inputs.release_version }}"
+          pr_title: "${{ github.event.inputs.project }} release v${{ github.event.inputs.release_version }}"
           pr_body: "To be merged after the release is complete."
 
       - name: Draft GitHub release
