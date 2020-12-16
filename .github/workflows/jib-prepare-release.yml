@@ -19,8 +19,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Build project
+      - name: Check input
         run: |
+          echo '* input project: "${{ github.event.inputs.project }}"'
+
           case ${{ github.event.inputs.project }} in
             build-plan|core|maven|gradle|extension-common|maven-extension|gradle-extension) ;;
             *) echo 'invalid input project name "${{ github.event.inputs.project }}"'
@@ -32,6 +34,8 @@ jobs:
             exit 1
           fi
 
+      - name: Build project
+        run: |
           # TODO: run integration test? (Requries auth with GCP.)
           ./gradlew clean build --stacktrace
 
@@ -43,11 +47,10 @@ jobs:
           git config user.name "Chanseok Oh"
 
           PROJECT=$( case ${{ github.event.inputs.project }} in
-            maven)            echo jib-maven-plugin ;;
-            gradle)           echo jib-gradle-plugin ;;
             extension-common) echo jib-plugins-extension-common ;;
             maven-extension)  echo jib-maven-plugin-extension-api ;;
             gradle-extension) echo jib-gradle-plugin-extension-api ;;
+            maven|gradle)     echo jib-${{ github.event.inputs.project }}-plugin ;;
             *)                echo jib-${{ github.event.inputs.project }} ;;
           esac )
           # This creates the tag (e.g., "v0.1.0-build-plan") and pushes the updated
@@ -65,7 +68,7 @@ jobs:
           pr_title: "${{ github.event.inputs.project }} release v${{ github.event.inputs.release_version }}"
           pr_body: "To be merged after the release is complete."
 
-      - name: Draft GitHub release
+      - name: Draft Maven/Gradle GitHub release
         uses: actions/create-release@v1
         if: ${{ github.event.inputs.project == 'maven' || github.event.inputs.project == 'gradle' }}
         id: create_release
@@ -83,3 +86,18 @@ jobs:
             ### Major Changes
             
             See [CHANGELOG.md](https://github.com/GoogleContainerTools/jib/blob/master/jib-${{ github.event.inputs.project }}-plugin/CHANGELOG.md) for more details.
+
+      - name: Draft Jib Core GitHub release
+        uses: actions/create-release@v1
+        if: ${{ github.event.inputs.project == 'core' }}
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.release_version }}-core
+          release_name: jib-core v${{ github.event.inputs.release_version }}
+          draft: true
+          body: |
+            ### Major Changes
+
+            See [CHANGELOG.md](https://github.com/GoogleContainerTools/jib/blob/master/jib-core/CHANGELOG.md) for more details.
