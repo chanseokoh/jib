@@ -43,6 +43,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: gradle_release_v${{ github.event.inputs.release_version }}
           pr_title: "Gradle release v${{ github.event.inputs.release_version }}"
+          pr_body: "To be merged after the release is complete."
 
       - name: Draft GitHub release
         uses: actions/create-release@v1
