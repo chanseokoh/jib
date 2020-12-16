@@ -57,6 +57,7 @@ jobs:
           body: |
             **Run `./jib-maven-plugin/scripts/update_gcs_latest.sh ${{ github.event.inputs.release_version }}`
             when the release is complete to update the latest Maven version string on GCS.**
+
             ---
             ### Major Changes
             
