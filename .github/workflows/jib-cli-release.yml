@@ -17,8 +17,8 @@ jobs:
 
       - name: Build project
         run: |
-          if [[ ! "${{ github.event.inputs.release_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+)?$ ]]; then
-            echo 'Version: "${{ github.event.inputs.release_version }}" not in ###.###.###[-XXX] format.'
+          if [[ ! "${{ github.event.inputs.release_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'version "${{ github.event.inputs.release_version }}" not in ###.###.### format'
             exit 1
           fi
           # TODO: run integration test? (Requries auth with GCP.)
