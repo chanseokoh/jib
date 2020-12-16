@@ -71,7 +71,6 @@ jobs:
       - name: Draft Maven/Gradle GitHub release
         uses: actions/create-release@v1
         if: ${{ github.event.inputs.project == 'maven' || github.event.inputs.project == 'gradle' }}
-        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -90,7 +89,6 @@ jobs:
       - name: Draft Jib Core GitHub release
         uses: actions/create-release@v1
         if: ${{ github.event.inputs.project == 'core' }}
-        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
