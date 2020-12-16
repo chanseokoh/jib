@@ -1,0 +1,60 @@
+name: Prepare Jib Core release
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: new release version
+        required: true
+        default: (for example, 0.1.0)
+
+jobs:
+  release:
+    name: Prepare Jib Core release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build project
+        run: |
+          if [[ ! "${{ github.event.inputs.release_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'version "${{ github.event.inputs.release_version }}" not in ###.###.### format'
+            exit 1
+          fi
+          # TODO: run integration test? (Requries auth with GCP.)
+          ./gradlew clean build --stacktrace
+
+      - name: Run Gradle release
+        run: |
+          git checkout -b core_release_v${{ github.event.inputs.release_version }}
+          # TODO: set this to the GitHub user triggering the workflow
+          git config user.email "chanseok@google.com"
+          git config user.name "Chanseok Oh"
+          # This creates the tag (e.g., "v0.1.0-core") and pushes the updated
+          # branch (e.g., "core_release_v0.1.0") and the new tag.
+          ./gradlew jib-core:release \
+            -Prelease.useAutomaticVersion=true \
+            -Prelease.releaseVersion=${{ github.event.inputs.release_version }}
+
+      - name: Create pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          # Provided by Actions. No need to create a token.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: core_release_v${{ github.event.inputs.release_version }}
+          pr_title: "Core release v${{ github.event.inputs.release_version }}"
+          pr_body: "To be merged after the release is complete."
+
+      - name: Draft GitHub release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.release_version }}-core
+          release_name: jib-core v${{ github.event.inputs.release_version }}
+          draft: true
+          body: |
+            ### Major Changes
+            
+            See [CHANGELOG.md](https://github.com/GoogleContainerTools/jib/blob/master/jib-core/CHANGELOG.md) for more details.
